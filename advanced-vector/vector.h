@@ -218,12 +218,11 @@ inline Vector<T>& Vector<T>::operator=(const Vector& other) {
             Vector new_data(other);
             Swap(new_data);
         } else {
-            if(other.size_ < size_) {
-                std::copy(other.data_.GetAddress(), other.data_.GetAddress() + other.size_, data_.GetAddress());
-                std::destroy_n(data_.GetAddress() + other.size_, size_ - other.size_);
+            std::copy_n(other.data_.GetAddress(), std::min(other.size_, size_), data_.GetAddress());
+            if(other.size_ < size_) {    
+                std::destroy_n(data_+ other.size_, size_ - other.size_);
             } else {
-                std::copy(other.data_.GetAddress(), other.data_.GetAddress() + size_, data_.GetAddress());
-                std::uninitialized_copy_n(other.data_.GetAddress() + size_, other.size_ - size_, data_.GetAddress() + size_);
+                std::uninitialized_copy_n(other.data_ + size_, other.size_ - size_, data_ + size_);
             }
             size_ = other.size_;
         }
