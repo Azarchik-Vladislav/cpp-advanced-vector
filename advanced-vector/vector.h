@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
@@ -112,7 +113,7 @@ private:
 //-------------------------RAW_MEMORY---------------------
 template <typename T>
 inline  RawMemory<T>::RawMemory(size_t capacity) : buffer_(Allocate(capacity)), 
-                                                  capacity_(capacity) {
+                                                   capacity_(capacity) {
 }
 
 template <typename T>
@@ -214,11 +215,13 @@ inline Vector<T>::Vector(Vector&& other) {
 template <typename T>
 inline Vector<T>& Vector<T>::operator=(const Vector& other) {
     if (this != &other) {
+
         if (other.size_ > data_.Capacity()) {
             Vector new_data(other);
             Swap(new_data);
         } else {
             std::copy_n(other.data_.GetAddress(), std::min(other.size_, size_), data_.GetAddress());
+            
             if(other.size_ < size_) {    
                 std::destroy_n(data_+ other.size_, size_ - other.size_);
             } else {
@@ -310,6 +313,7 @@ inline typename Vector<T>::iterator Vector<T>::Emplace(const_iterator pos, Args&
 
     size_t range = pos - begin();
     if(size_ < data_.Capacity()) {
+
         if(pos == end()) {
             new(end()) T(std::forward<Args>(args)...);
         } else {
