@@ -132,6 +132,16 @@ void Test1() {
         assert(v.Capacity() == SIZE);
         assert(v.Size() == 0);
     }
+
+    {
+        Vector<Obj> v{{1, "Ivan"}, {2, "Misha"}, {3, "Vlad"}};
+        assert(v.Capacity() == 3);
+        assert(v.Size() == 3);
+        assert(Obj::num_constructed_with_id_and_name == 3);
+    }
+
+    Obj::ResetCounters();
+
     {
         Vector<int> v(SIZE);
         const auto& cv(v);
@@ -415,7 +425,10 @@ void Test6() {
         assert(v.end() == cv.end());
         assert(v.cbegin() == cv.begin());
         assert(v.cend() == cv.end());
+        assert(*v.rbegin() == 1);
+        assert(*(v.rbegin() + 1) == 0);
     }
+    
     {
         Obj::ResetCounters();
         Vector<Obj> v{SIZE};

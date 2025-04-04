@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <memory>
 #include <new>
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -53,6 +54,7 @@ public:
     ~Vector();
 
     explicit Vector(size_t size);
+    explicit Vector(std::initializer_list<T> init_list);
 
     Vector(const Vector& other); 
     Vector(Vector&& other);
@@ -63,11 +65,23 @@ public:
     const T& operator[](size_t index) const noexcept;
     T& operator[](size_t index) noexcept;
 
+    const T& At(size_t index) const noexcept;
+    T& At(size_t index) noexcept;
+
+    const T& Front() const noexcept;
+    T& Front() noexcept;
+
+    const T& Back() const noexcept;
+    T& Back() noexcept;
+
     using iterator = T*;
     using const_iterator = const T*;
+    using reverse_iterator = std::reverse_iterator<iterator>;
     
     iterator begin() noexcept;
     iterator end() noexcept;
+    reverse_iterator rbegin() noexcept;
+    reverse_iterator rend() noexcept;
     const_iterator begin() const noexcept;
     const_iterator end() const noexcept;
     const_iterator cbegin() const noexcept;
@@ -202,6 +216,12 @@ inline Vector<T>::Vector(size_t size) : data_(size),
 }
 
 template <typename T>
+inline Vector<T>::Vector(std::initializer_list<T> init_list) : data_(init_list.size()),
+                                                               size_(init_list.size()) {
+    std::move(init_list.begin(), init_list.end(), this->begin());
+}
+
+template <typename T>
 inline Vector<T>::Vector(const Vector& other) : data_(other.size_),
                                                 size_(other.size_) {
     std::uninitialized_copy_n(other.data_.GetAddress(), size_, data_.GetAddress());   
@@ -255,6 +275,44 @@ inline T& Vector<T>::operator[](size_t index) noexcept {
 }
 
 template <typename T>
+inline const T& Vector<T>::At(size_t index) const noexcept {
+    if(index >= size_){
+        throw std::out_of_range("Out of vector range");
+    }
+    
+    return data_[index];
+}
+
+template <typename T>
+inline T& Vector<T>::At(size_t index) noexcept {
+    if(index >= size_){
+        throw std::out_of_range("Out of vector range");
+    }
+    
+    return data_[index];
+}
+
+template <typename T>
+inline const T& Vector<T>::Front() const noexcept {
+    return data_[0];
+}
+
+template <typename T>
+inline T& Vector<T>::Front() noexcept {
+    return data_[0];
+}
+
+template <typename T>
+inline const T& Vector<T>::Back() const noexcept {
+    return data_[size_ - 1];
+}
+
+template <typename T>
+inline T &Vector<T>::Back() noexcept {
+    return data_[size_ - 1];
+}
+
+template <typename T>
 inline typename Vector<T>::iterator Vector<T>::begin() noexcept {
     return data_.GetAddress();
 }
@@ -262,6 +320,16 @@ inline typename Vector<T>::iterator Vector<T>::begin() noexcept {
 template <typename T>
 inline typename Vector<T>::iterator Vector<T>::end() noexcept {
     return data_ + size_;
+}
+
+template <typename T>
+inline typename Vector<T>::reverse_iterator Vector<T>::rbegin() noexcept {
+    return reverse_iterator(end());
+}
+
+template <typename T>
+inline typename Vector<T>::reverse_iterator Vector<T>::rend() noexcept {
+    return reverse_iterator(begin());
 }
 
 template <typename T>
